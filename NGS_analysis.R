@@ -50,3 +50,41 @@ head(results_WT_tr_vs_WT_unt_PValue)
 write.csv(as.data.frame(results_WT_tr_vs_WT_unt_PValue), file="WT_exp_tr_vs_WT_exp_unt_DE.csv") # To save the output; change title as you deem fit
 
 # End
+
+
+# Bacterial gene IDs do not always show like eukaryotes where we can map it using ENSEMBL ID, so I used this process
+
+# Mapping of gene names to gene ID in DESeq files
+rm(list = ls())
+
+library(ggplot2)
+library(dplyr)
+
+
+DExp <- read.csv("WT_exp_tr_vs_WT_exp_unt_DE.csv")
+
+
+if (!require("BiocManager", quietly = TRUE))
+  install.packages("BiocManager")
+
+BiocManager::install("rtracklayer")
+
+library(rtracklayer)
+
+
+gff_file <- "/Users/homeoga/Documents/NGS_data/Annot.gff3" # Download the "Annot.gff3" file and give the path
+
+gff_data <- import.gff3(gff_file, format = "GFF3")
+
+View(gff_data)
+gene_ids <- DExp$gene
+
+
+# Extracting Gene ID and Gene Name Info from gff annotation file
+gene_IDs <- mcols(gff_data)$gene_id
+gene_names <- mcols(gff_data)$Name
+
+gene_mapping <- data.frame(genes = gene_IDs, GeneName = gene_names, stringsAsFactors = FALSE)
+merged_data <- left_join(DExp, gene_mapping, by = "genes")
+
+write.csv(merged_data, "WT_exp_tr_vs_WT_exp_unt_DE_with_Gene_Names.csv", row.names=FALSE)
