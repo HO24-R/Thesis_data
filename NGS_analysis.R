@@ -211,3 +211,5 @@ pheatmap(
   fontsize_col = 10,            # Font size for column labels
   labels_col = colnames(DEGs_matrix)  # Add descriptive column names
 )
+
+#yes and no
